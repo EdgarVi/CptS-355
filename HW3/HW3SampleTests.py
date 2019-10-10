@@ -13,7 +13,7 @@ class HW3SampleTests(unittest.TestCase):
         self.sprint1 = {'task1': {'John': 5, 'Rae': 10, 'Kelly': 8, 'Alex': 11}, 'task2': {'Rae': 4, 'Alex': 2, 'Aaron': 15}, 'task3': {'Kelly': 5, 'Alex': 1, 'Ethan': 12, 'Helen': 10}}
         self.sprint2 = {'task1': {'Mark': 5, 'Kelly': 10, 'Alex': 15}, 'task2': {'Mark': 2, 'Alex': 2, 'Rae': 10, 'Aaron': 10}, 'task4': {'Helen': 16}}
         self.addedSprints = {'task1': {'John': 5, 'Rae': 10, 'Kelly': 18, 'Alex': 26, 'Mark': 5}, 'task2': {'Rae': 14, 'Alex': 4, 'Aaron': 25, 'Mark': 2}, 'task3': {'Kelly': 5, 'Alex': 1, 'Ethan': 12, 'Helen': 10}, 'task4': {'Helen': 16}}
-    """
+
         # addNLogs input/output
         self.logList = [self.log1,self.log2,self.log3,self.log4]
         self.sprintSummary = {'task1': {'John': 5, 'Rae': 10, 'Kelly': 18, 'Alex': 26, 'Mark': 5}, 'task2': {'Rae': 14, 'Alex': 4, 'Aaron': 25, 'Mark': 2}, 'task3': {'Kelly': 5, 'Alex': 1, 'Ethan': 12, 'Helen': 10}, 'task4': {'Helen': 16}, 'task5': {'Aaron': 15, 'Rae': 20, 'Kelly': 20}, 'task6': {'Aaron': 8, 'Helen': 26, 'Alex': 15}}
@@ -23,18 +23,18 @@ class HW3SampleTests(unittest.TestCase):
         # iterFile output
         self.filetokens = ["CptS","355","Assignment","3","-","Python","Warmup","This","is","a","text","test","file","for","CptS","355","-","Assignment","3","-","Python","Warmup","With","some","repeated","text","for","CptS","355","-","Assignment","3","-","Python","Warmup","."]
         self.histogram = [('-', 5), ('3', 3), ('355', 3), ('Assignment', 3), ('CptS', 3), ('Python', 3), ('Warmup', 3), ('for', 2), ('text', 2), ('.', 1), ('This', 1), ('With', 1), ('a', 1), ('file', 1), ('is', 1), ('repeated', 1), ('some', 1), ('test', 1)]
-    """        
+      
     def test_sprintLog(self):
         self.assertDictEqual(sprintLog(self.log1),self.sprint1)
         self.assertDictEqual(sprintLog(self.log2),self.sprint2)
     
-    """
+    
     def test_addSprints(self):
         self.assertDictEqual(addSprints(self.sprint1,self.sprint2),self.addedSprints)
 
     def test_addNLogs(self):
         self.assertDictEqual(addNLogs(self.logList),self.sprintSummary)
-
+    """
     def test_lookupVal(self):
         self.assertEqual(lookupVal(self.lookupList,"x"),2)
         self.assertEqual(lookupVal(self.lookupList,"y"),False)
