@@ -20,6 +20,9 @@ class HW3SampleTests(unittest.TestCase):
         #lookupVal inputs
         self.lookupList = [{"x":1,"y":True,"z":"found"},{"x":2},{"y":False}]
         self.lookup2List = [(0,{"x":0,"y":True,"z":"zero"}), (0,{"x":1}), (1,{"y":False}), (1,{"x":3, "z":"three"}), (2,{})]
+        # unzip input/output
+        self.unzipInput = ([(1,"a",{1:"a" }),(2,"b",{2:"b"}),(3,"c",{3:"c"}),(4,"d" ,{4:"d"})])
+        self.unzipOutput = ([1, 2, 3, 4], ['a', 'b', 'c', 'd'], [{1 :'a' }, {2 :'b'}, {3 : 'c' }, {4 : 'd'}])
         # iterFile output
         self.filetokens = ["CptS","355","Assignment","3","-","Python","Warmup","This","is","a","text","test","file","for","CptS","355","-","Assignment","3","-","Python","Warmup","With","some","repeated","text","for","CptS","355","-","Assignment","3","-","Python","Warmup","."]
         self.histogram = [('-', 5), ('3', 3), ('355', 3), ('Assignment', 3), ('CptS', 3), ('Python', 3), ('Warmup', 3), ('for', 2), ('text', 2), ('.', 1), ('This', 1), ('With', 1), ('a', 1), ('file', 1), ('is', 1), ('repeated', 1), ('some', 1), ('test', 1)]
@@ -34,19 +37,26 @@ class HW3SampleTests(unittest.TestCase):
 
     def test_addNLogs(self):
         self.assertDictEqual(addNLogs(self.logList),self.sprintSummary)
-    """
+
     def test_lookupVal(self):
         self.assertEqual(lookupVal(self.lookupList,"x"),2)
         self.assertEqual(lookupVal(self.lookupList,"y"),False)
         self.assertEqual(lookupVal(self.lookupList,"z"),"found")
         self.assertEqual(lookupVal(self.lookupList,"t"),None)
 
+    
     def test_lookupVal2(self):
-        pass
+        self.assertEqual(lookupVal2(self.lookup2List, "x"), 1)
+        self.assertEqual(lookupVal2(self.lookup2List, "y"), False)
+        self.assertEqual(lookupVal2(self.lookup2List, "z"), "zero")
+        self.assertEqual(lookupVal2(self.lookup2List, "t"), None)
+        
+    
 
     def test_unzip(self):
-        pass
-    
+        self.assertEqual(unzip(self.unzipInput), self.unzipOutput)
+
+    """
     def test_numPaths(self):
         pass 
 
