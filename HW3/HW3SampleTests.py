@@ -56,10 +56,14 @@ class HW3SampleTests(unittest.TestCase):
     def test_unzip(self):
         self.assertEqual(unzip(self.unzipInput), self.unzipOutput)
 
-    """
+    
     def test_numPaths(self):
-        pass 
+        self.assertEqual(numPaths(2,2,[(2,1)]), 1)
+        self.assertEqual(numPaths(3,3,[(2,3)]), 3) 
+        self.assertEqual(numPaths(4,3,[(2,2)]), 4) 
+        self.assertEqual(numPaths(10,3,[(2,2),(7 ,1)]), 27)
 
+    """
     def test_iterFile(self):
         mywords = iterFile("testfile.txt")
         self.assertEqual(mywords.__next__(),"CptS")  
