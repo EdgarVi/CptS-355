@@ -61,22 +61,18 @@ class HW3SampleTests(unittest.TestCase):
         self.assertEqual(numPaths(2,2,[(2,1)]), 1)
         self.assertEqual(numPaths(3,3,[(2,3)]), 3) 
         self.assertEqual(numPaths(4,3,[(2,2)]), 4) 
-        self.assertEqual(numPaths(10,3,[(2,2),(7 ,1)]), 27)
+        self.assertEqual(numPaths(10,3,[(2,2),(7,1)]), 27)
 
-    """
+    
     def test_iterFile(self):
         mywords = iterFile("testfile.txt")
         self.assertEqual(mywords.__next__(),"CptS")  
         self.assertEqual(mywords.__next__(),"355")
         self.assertEqual(mywords.__next__(),"Assignment")
-        restofFile = []
-        for word in mywords:  
-            restofFile.append(word)
-        self.assertEqual(restofFile,self.filetokens[3:])
-
-    def test_wordHistogram(self):
-        pass
-    """
+        #restofFile = []
+        #for word in mywords:  
+        #   restofFile.append(word)
+        #self.assertEqual(restofFile,self.filetokens[3:])
+    
 if __name__ == '__main__':
     unittest.main()
-

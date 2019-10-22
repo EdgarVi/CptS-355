@@ -81,34 +81,95 @@ def unzip(L):
     tup = (list(l1), list(l2), list(l3))
     return tup
 
-"""
-blocks is a list of tuples
-the tuples represent the coordinates that the robot 
-can't go through
-robot can only go right or down
-"""
 # 4. numPaths(m, n, blocks)
-def numPathsHelper(m, n, i, j, blocks):
-    if(i == m and j == n): # terminate
+def numPathsHelper(m, n, verticalIndex, horizontalIndex, blocks):
+    if(verticalIndex == m and horizontalIndex == n): # terminate
         return 1
     
-    # move right
-        # check if location valid, if so, recurse right
+    down = 0
+    right = 0
+    
     # move down
-        # check if location valid, if so, recurse down
-    return 0
+    # check if location valid, if so, recurse down
+    if((verticalIndex) <= m):
+        verticalIndex += 1
+        # search for tuple 
+        if((verticalIndex, horizontalIndex) in blocks):
+            pass
+        else:            
+            down = numPathsHelper(m, n, verticalIndex, horizontalIndex, blocks) 
+            verticalIndex -= 1 # toggle index
+
+    # move down
+    # check if location valid, if so, recurse right
+    if((horizontalIndex) <= n):
+        horizontalIndex += 1
+        if((verticalIndex, horizontalIndex) in blocks):
+            pass
+        else:
+            right = numPathsHelper(m, n, verticalIndex, horizontalIndex, blocks)
+            horizontalIndex -= 1 
+    # return the result of recursion
+    return down + right 
+
 def numPaths(m, n, blocks):
 
     return numPathsHelper(m, n, 1, 1, blocks)
-    """
-    # base case
-    if(m == 1 or n == 1):
-        return 1
     
-    return numPaths(m - 1, n, blocks) + numPaths(m, n - 1, blocks)
-    """
+# 5a. iterFile()
+class iterFile():
+    def __init__(self, filename):
+        self.fileobject = open(filename, "r")
+        pass
+
+    def __next__(self):
+        buf = self.fileobject.read(1)
+        s = ""
+        if buf in ['\n', '\r\n', ' ', '']:
+            print("empty line")
+
+        while(buf != " "):
+            s += buf
+            buf = self.fileobject.read(1)
+
+        return s
+
+    def __iter__(self):
+        return self
+
+# 5b. wordHistorgram(words)
+def wordHistorgram(words):
+    pass
 
 if __name__ == '__main__':
-    log1 = {'John': {'task1': 5}, 'Rae': {'task1': 10, 'task2': 4}, 'Kelly': {'task1': 8, 'task3': 5}, 'Alex': {'task1': 11, 'task2': 2, 'task3': 1}, 'Aaron': {'task2': 15}, 'Ethan':{'task3': 12}, 'Helen': {'task3': 10}}
-    sprintLog(log1)
-    print("hello HW 3")
+    #print("Run HW3SampleTests.py to unit test this code!")
+    it = iterFile("testfile.txt")
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+    wrd = it.__next__()
+
+
