@@ -1,5 +1,5 @@
 import unittest
-from Cpts355_Assign4_solution_fall2019 import *
+from HW4_part1 import *
 
 class HW4Sampletests_part1(unittest.TestCase):
 
@@ -7,7 +7,7 @@ class HW4Sampletests_part1(unittest.TestCase):
         #clear the opstack and the dictstack
         opstack [:] = []
         dictstack [:] = []     
-       
+        
     def test_lookup(self):
         #/v 3 def /v 4 def /v 5 def v
         dictPush({'/v':3})
@@ -260,19 +260,19 @@ class HW4Sampletests_part1(unittest.TestCase):
 
     # # (4 pts) Make sure that the following test prints/raises an error message about the type of the second argument
     # #  Also make sure that the opstack content is : ['/x', 10]
-    # def test_divInputs(self):
-    #     opPush(10)
-    #     opPush("/x")
-    #     div()
-    #     print(opstack)
+    def test_divInputs(self):
+        opPush(10)
+        opPush("/x")
+        div()
+        print(opstack)
 
     # # Make sure that the following test prints/raises an error message about the type of the first argument (the variable name needs be a string)
     # # 4 pts
-    # def test_psDefInputs(self):
-    #     opPush(1)
-    #     opPush(10)
-    #     psDef()
-    #     print(opstack)
+    def test_psDefInputs(self):
+        opPush(1)
+        opPush(10)
+        psDef()
+        print(opstack)
 
 
 if __name__ == '__main__':

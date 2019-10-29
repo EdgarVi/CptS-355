@@ -1,114 +1,220 @@
-# WRITE YOUR NAME and YOUR COLLABORATORS HERE
+# Programmer: Edgar Villasenor
+# WSU ID: 11536698
+# CptS 355 Programming Language Design
+# 28 October 2019
 
 #------------------------- 10% -------------------------------------
 # The operand stack: define the operand stack and its operations
-opstack = []  #assuming top of the stack is the end of the list
+opstack = []  # define the top of stack as the end of the list
 
-# Now define the helper functions to push and pop values on the opstack 
-# (i.e, add/remove elements to/from the end of the Python list)
-# Remember that there is a Postscript operator called "pop" so we choose 
-# different names for these functions.
-# Recall that `pass` in python is a no-op: replace it with your code.
-
+# returns the popped value
 def opPop():
-    pass
-    # opPop should return the popped value.
-    # The pop() function should call opPop to pop the top value from the opstack, but it will ignore the popped value.
+    return opstack.pop()
 
+# pushes value to opstack
 def opPush(value):
-    pass
+    opstack.append(value)
 
 #-------------------------- 20% -------------------------------------
-# The dictionary stack: define the dictionary stack and its operations
-dictstack = []  #assuming top of the stack is the end of the list
+# definition of dictstack and associated operations
+dictstack = []   # define the top of stack as the end of the list
 
-# now define functions to push and pop dictionaries on the dictstack, to 
-# define name, and to lookup a name
-
+# dictPop pops the top dictionary from the dictionary stack.
 def dictPop():
-    pass
-    # dictPop pops the top dictionary from the dictionary stack.
+    return dictstack.pop()
 
+# dictPush pushes the dictionary ‘d’ to the dictstack. 
 def dictPush(d):
-    pass
-    #dictPush pushes the dictionary ‘d’ to the dictstack. 
-    #Note that, your interpreter will call dictPush only when Postscript 
-    #“begin” operator is called. “begin” should pop the empty dictionary from 
-    #the opstack and push it onto the dictstack by calling dictPush.
-
+    dictstack.append(d)
+    
+# add "name:value" pair to the top dictionary in the dictionary stack. 
 def define(name, value):
-    pass
-    #add name:value pair to the top dictionary in the dictionary stack. 
-    #Keep the '/' in the name constant. 
-    #Your psDef function should pop the name and value from operand stack and 
-    #call the “define” function.
+    i = len(dictstack)
+    if(i != 0):
+        i -= 1
+        dictstack[i][name] = value # add the pair to top dictionary in dictstack
+    else:
+        d = {name:value}
+        dictPush(d)
 
+# returns the value associated with name
 def lookup(name):
-    pass
-    # return the value associated with name
-    # What is your design decision about what to do when there is no definition for “name”? If “name” is not defined, your program should not break, but should give an appropriate error message.
+    if(name[0] != '/'):
+        name = '/' + name
+    for d in reversed(dictstack):
+        if d.get(name) != None:
+            return d[name]
+    
+    # if the value is not found in the dictstack, raise an exception so the program doesn't crash
+    raise Exception('key ' + '\'' + name + '\'' + ' was not found in dictstack') 
+    
 
 
 #--------------------------- 10% -------------------------------------
 # Arithmetic and comparison operators: add, sub, mul, eq, lt, gt
-# Make sure to check the operand stack has the correct number of parameters 
-# and types of the parameters are correct.
+
 def add():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = op1 + op2
+    opPush(res)
 
 def sub():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = op2 - op1
+    opPush(res)
 
 def mul():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = op1 * op2
+    opPush(res)
+
+def div():
+    op1 = opPop()
+    op2 = opPop()
+    if(type(op1) != int or type(op2) != int):
+        raise Exception("Both values must be integers")
+    res = op2 / op1
+    opPush(res)
 
 def eq():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = False
+    if op1 == op2:
+        res = True
+    opPush(res)
 
 def lt():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = False
+    if op1 >= op2:
+        res = True
+    opPush(res)
 
 def gt():
-    pass
+    op1 = opPop()
+    op2 = opPop()
+    res = False
+    if op1 <= op2:
+        res = True
+    opPush(res)
 
 #--------------------------- 25% -------------------------------------
 # Array operators: define the string operators length, get, put, aload, astore
+
+# returns the list of the SPS array in the opstack
 def length():
-    pass
+    tup = opPop() # for now assume array is always top element, fine for current test casess
+    l = tup[0]
+    opPush(l)
 
-def get():
-    pass
 
+# returns the indexed element on the top of the stack
+def get(): 
+    i = opPop() # grab index from top of stack
+    tup = opPop() # grab array tuple from top of stack
+    res = tup[1][i] # extract value at index i
+    opPush(res)
+    return res
+
+# removes the two values and the array object from stack
+# puts value at index of array
 def put():
-    pass
+    val = opPop() # value to replace with
+    i = opPop() # index
+    tup = opPop() # array tuple
 
+    tup[1][i] = val
+
+    opPush(tup)
+    
+# removes the array from stack, pushes every value onto the 
+# stack then pushes the array back onto the stack
 def aload():
-    pass
+    tup = opPop()
+    ar = tup[1]
 
+    sz = len(ar)
+    i = 0
+    while(i < sz):
+        opPush(ar[i])
+        i += 1
+    opPush(tup)
+
+# removes the array from the stack
+# pops as many values from the stack as the length
+# of the array, stores those values in the array 
+# pushes array back to stack
 def astore():
-    pass
+    tup = opPop()
+    alength = tup[0]
+    i = 0
+    ar = []
+    while i < alength:
+        ar.append(opPop())
+        i += 1
+    ar.reverse()
+    t = (tup[0], ar)
+    
+    opPush(t)
 #--------------------------- 15% -------------------------------------
 # Define the stack manipulation and print operators: dup, copy, pop, clear, exch, roll, stack
+
+# duplicate the top value of the stack and push it on to the top of the stack
 def dup():
-    pass
+    if len(opstack) == 0:
+        return None
+    res = opPop()
+    opPush(res)
+    opPush(res)
+    return res
 
 def copy():
-    pass
+    i = opPop() # number of values to copy
+    j = len(opstack) - 1 # list index
+    q = []
+    while i > 0:
+        q.append(opstack[j])
+        i -= 1
+        j -= 1
+    
+    j = len(q) - 1
+    while j >= 0:
+        opPush(q[j])
+        j -= 1
+    
 
 def count():
-    pass
+    sz = len(opstack)
+    opPush(sz)
 
 def pop():
-    pass
+    return opPop()
 
+# clear the stack
 def clear():
-    pass
+    sz = len(opstack) - 1
+    while(sz >= 0):
+        opPop()    
+        sz -= 1
 
+# swaps the top two stack values
 def exch():
-    pass
+    v1 = opPop()
+    v2 = opPop()
+    opPush(v1)
+    opPush(v2)
 
+# display contents of the stack starting from the top
 def stack():
-    pass
+    i = len(opstack)
+    while i >= 0:
+        print(opstack[i])
+        i -= 0
 
 #--------------------------- 20% -------------------------------------
 # Define the dictionary manipulation operators: psDict, begin, end, psDef
@@ -116,14 +222,25 @@ def stack():
 # Note: The psDef operator will pop the value and name from the opstack and call your own "define" operator (pass those values as parameters).
 # Note that psDef()won't have any parameters.
 
+# takes one operand from the operand stack, ignores it, and creates a new empty dictionary
+# on the operand stack
 def psDict():
-    pass
+    opPop()
+    d = {}
+    opPush(d)
 
 def begin():
-    pass
+    d = opPop()
+    dictPush(d)
 
 def end():
-    pass
+    dictPop()
 
+# pop name and value from opstack and call define()
 def psDef():
-    pass
+    vl = opPop()
+    nm = opPop()
+    if(type(nm) != str):
+        raise Exception("Name must be a string")
+
+    define(nm, vl) # push to dictstack
