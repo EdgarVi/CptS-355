@@ -3,7 +3,8 @@
 # CptS 355 Programming Language Design
 # 8 November 2019
 
-#------------------------- 10% -------------------------------------
+import re
+
 # The operand stack: define the operand stack and its operations
 opstack = []  # define the top of stack as the end of the list
 
@@ -15,7 +16,6 @@ def opPop():
 def opPush(value):
     opstack.append(value)
 
-#-------------------------- 20% -------------------------------------
 # definition of dictstack and associated operations
 dictstack = []   # define the top of stack as the end of the list
 
@@ -50,7 +50,6 @@ def lookup(name):
     
 
 
-#--------------------------- 10% -------------------------------------
 # Arithmetic and comparison operators: add, sub, mul, eq, lt, gt
 
 def add():
@@ -103,7 +102,6 @@ def gt():
         res = True
     opPush(res)
 
-#--------------------------- 25% -------------------------------------
 # Array operators: define the string operators length, get, put, aload, astore
 
 # returns the list of the SPS array in the opstack
@@ -161,7 +159,7 @@ def astore():
     t = (tup[0], ar)
     
     opPush(t)
-#--------------------------- 15% -------------------------------------
+
 # Define the stack manipulation and print operators: dup, copy, pop, clear, exch, roll, stack
 
 # duplicate the top value of the stack and push it on to the top of the stack
@@ -216,11 +214,7 @@ def stack():
         print(opstack[i])
         i -= 0
 
-#--------------------------- 20% -------------------------------------
-# Define the dictionary manipulation operators: psDict, begin, end, psDef
-# name the function for the def operator psDef because def is reserved in Python. Similarly, call the function for dict operator as psDict.
-# Note: The psDef operator will pop the value and name from the opstack and call your own "define" operator (pass those values as parameters).
-# Note that psDef()won't have any parameters.
+# Dictionary manipulation operators
 
 # takes one operand from the operand stack, ignores it, and creates a new empty dictionary
 # on the operand stack
@@ -244,3 +238,65 @@ def psDef():
         raise Exception("Name must be a string")
 
     define(nm, vl) # push to dictstack
+
+
+# Parse SPS
+def tokenize(s):
+    return re.findall("/?[a-zA-Z][a-zA-Z0-9_]*|[\[][a-zA-Z-?0-9_\s!][a-zA-Z-?0-9_\s!]*[\]]|[-]?[0-9]+|[}{]+|%.*|[^ \t\n]", s)
+
+
+# COMPLETE THIS FUNCTION
+# The it argument is an iterator.
+# The sequence of return characters should represent a list of properly nested
+# tokens, where the tokens between '{' and '}' is included as a sublist. If the
+# parenteses in the input iterator is not properly nested, returns False.
+def groupMatch(it):
+    res = []
+    for c in it:
+        if c == '}':
+            return res
+        elif c=='{':
+            # Note how we use a recursive call to group the tokens inside the
+            # inner matching parenthesis.
+            # Once the recursive call returns the code-array for the inner 
+            # parenthesis, it will be appended to the list we are constructing 
+            # as a whole.
+            res.append(groupMatch(it))
+        else:
+            res.append(c)
+    return False
+
+
+
+# COMPLETE THIS FUNCTION
+# Function to parse a list of tokens and arrange the tokens between { and } braces 
+# as code-arrays.
+# Properly nested parentheses are arranged into a list of properly nested lists.
+def parse(L):
+    res = []
+    it = iter(L)
+    for c in it:
+        if c=='}':  #non matching closing parenthesis; return false since there is 
+                    # a syntax error in the Postscript code.
+            return False
+        elif c=='{':
+            res.append(groupMatch(it))
+        else:
+            res.append(c)
+    return res
+
+# COMPLETE THIS FUNCTION 
+# Write auxiliary functions if you need them. This will probably be the largest function of the whole project, 
+# but it will have a very regular and obvious structure if you've followed the plan of the assignment.
+def interpretSPS(code): # code is a code array
+    pass
+
+
+def interpreter(s): # s is a string
+    interpretSPS(parse(tokenize(s)))
+
+
+#clear opstack and dictstack
+def clearStacks():
+    opstack[:] = []
+    dictstack[:] = []
