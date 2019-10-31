@@ -240,7 +240,7 @@ def psDef():
     define(nm, vl) # push to dictstack
 
 
-# Parse SPS
+# tokenize code array
 def tokenize(s):
     return re.findall("/?[a-zA-Z][a-zA-Z0-9_]*|[\[][a-zA-Z-?0-9_\s!][a-zA-Z-?0-9_\s!]*[\]]|[-]?[0-9]+|[}{]+|%.*|[^ \t\n]", s)
 
@@ -294,9 +294,23 @@ def interpretSPS(code): # code is a code array
 
 def interpreter(s): # s is a string
     interpretSPS(parse(tokenize(s)))
-
+    
 
 #clear opstack and dictstack
 def clearStacks():
     opstack[:] = []
     dictstack[:] = []
+
+
+def main():
+    print("main")
+    input1 = """
+        /square {dup mul} def 
+        [-5 -4 3 -2 1] dup aload length 0 exch -1 1 
+        {pop exch square add} for 
+        55 eq stack
+        """
+    print(tokenize(input1))
+    print(parse(tokenize(input1)))
+    
+main()
