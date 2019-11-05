@@ -266,7 +266,12 @@ def groupMatch(it):
             res.append(c)
     return False
 
-
+def isInteger(c):
+    try:
+        int(c)
+        return True
+    except:
+        return False
 
 # COMPLETE THIS FUNCTION
 # Function to parse a list of tokens and arrange the tokens between { and } braces 
@@ -281,6 +286,10 @@ def parse(L):
             return False
         elif c=='{':
             res.append(groupMatch(it))
+        elif isInteger(c):
+            res.append(int(c))
+        elif c == 'false':
+            res.append(False)
         else:
             res.append(c)
     return res
