@@ -29,6 +29,7 @@ def dictPush(d):
     
 # add "name:value" pair to the top dictionary in the dictionary stack. 
 def define(name, value):
+
     i = len(dictstack)
     if(i != 0):
         i -= 1
@@ -36,7 +37,7 @@ def define(name, value):
     else:
         d = {name:value}
         dictPush(d)
-
+    
 # returns the value associated with name
 def lookup(name):
     if(name[0] != '/'):
@@ -48,7 +49,6 @@ def lookup(name):
     # if the value is not found in the dictstack, raise an exception so the program doesn't crash
     raise Exception('key ' + '\'' + name + '\'' + ' was not found in dictstack') 
     
-
 
 # Arithmetic and comparison operators: add, sub, mul, eq, lt, gt
 
@@ -104,7 +104,7 @@ def gt():
 
 # Array operators: define the string operators length, get, put, aload, astore
 
-# returns the list of the SPS array in the opstack
+# remove array from stack and push it's length to stack
 def length():
     tup = opPop() # for now assume array is always top element, fine for current test casess
     l = tup[0]
@@ -133,15 +133,18 @@ def put():
 # removes the array from stack, pushes every value onto the 
 # stack then pushes the array back onto the stack
 def aload():
+
     tup = opPop()
     ar = tup[1]
 
+    
     sz = len(ar)
     i = 0
     while(i < sz):
         opPush(ar[i])
         i += 1
     opPush(tup)
+    
 
 # removes the array from the stack
 # pops as many values from the stack as the length
@@ -164,11 +167,14 @@ def astore():
 
 # duplicate the top value of the stack and push it on to the top of the stack
 def dup():
+
     if len(opstack) == 0:
         return None
+    
     res = opPop()
     opPush(res)
     opPush(res)
+   
     return res
 
 def copy():
@@ -232,6 +238,7 @@ def end():
 
 # pop name and value from opstack and call define()
 def psDef():
+
     vl = opPop()
     nm = opPop()
     if(type(nm) != str):
@@ -245,35 +252,35 @@ def tokenize(s):
     return re.findall("/?[a-zA-Z][a-zA-Z0-9_]*|[\[][a-zA-Z-?0-9_\s!][a-zA-Z-?0-9_\s!]*[\]]|[-]?[0-9]+|[}{]+|%.*|[^ \t\n]", s)
 
 
-# COMPLETE THIS FUNCTION
-# The it argument is an iterator.
-# The sequence of return characters should represent a list of properly nested
-# tokens, where the tokens between '{' and '}' is included as a sublist. If the
-# parenteses in the input iterator is not properly nested, returns False.
+# The sequence of return characters is represented as list of properly nested
+# tokens, where the tokens between '{' and '}' are included as a sublist. If the
+# parentheses in the input iterator is not properly nested, return False.
 def groupMatch(it):
     res = []
     for c in it:
         if c == '}':
             return res
         elif c=='{':
-            # Note how we use a recursive call to group the tokens inside the
-            # inner matching parenthesis.
-            # Once the recursive call returns the code-array for the inner 
-            # parenthesis, it will be appended to the list we are constructing 
-            # as a whole.
             res.append(groupMatch(it))
         else:
             res.append(c)
     return False
 
-def isInteger(c):
-    try:
-        int(c)
-        return True
-    except:
-        return False
+# if we encounter a '[' in the token, we have to create tuple of the elements
+# note that it is a string in the form: '[5 4 3 -1 1]' so we need to tokenize it
+def arrayMatching(it):
+    arr = []
+    it = it[:-1] # remove final ']' from string
+    chars = it.split(' ') # chars is an array of tokens now
 
-# COMPLETE THIS FUNCTION
+    for c in chars:
+        arr.append(int(c))
+    
+    res = (len(arr), arr) # put into tuple
+    return res
+
+
+
 # Function to parse a list of tokens and arrange the tokens between { and } braces 
 # as code-arrays.
 # Properly nested parentheses are arranged into a list of properly nested lists.
@@ -286,23 +293,111 @@ def parse(L):
             return False
         elif c=='{':
             res.append(groupMatch(it))
-        elif isInteger(c):
-            res.append(int(c))
-        elif c == 'false':
-            res.append(False)
+        elif c[0] == '[':
+            arr = arrayMatching(c[1:]) # pass in rest of list
+            res.append(arr)
         else:
-            res.append(c)
+            x = tryConvert(c) # try to convert from string to bool or int
+            res.append(x)
     return res
 
-# COMPLETE THIS FUNCTION 
-# Write auxiliary functions if you need them. This will probably be the largest function of the whole project, 
-# but it will have a very regular and obvious structure if you've followed the plan of the assignment.
-def interpretSPS(code): # code is a code array
-    pass
+# try to convert string to  corresponding value
+def tryConvert(c):
+    if c == 'false':
+        return False
+    elif c == 'true':
+        return True
+    try:
+        v = int(c)
+        return v
+    except ValueError:
+        pass
+    return c
 
+
+funDict = {
+    "opPop": opPop,
+    "dictPop": dictPop,
+    "length": length,
+    "add": add,
+    "sub": sub,
+    "mul": mul,
+    "div": div,
+    "eq": eq,
+    "lt": lt,
+    "gt": gt,
+    "get": get,
+    "dup": dup,
+    "exch": exch,
+    "pop": pop,
+    "copy": copy,
+    "clear": clear,
+    "stack": stack,
+    "dict": psDict,
+    "begin": begin,
+    "end": end,
+    "def": psDef,
+    "aload": aload
+}
+
+def psIf():
+    codearray = opPop()
+    boolVal = opPop()
+    if isinstance(boolVal, bool) and boolVal == True:
+        codearray = iter(codearray)
+        interpretSPS(codearray)
+
+def psIfelse(item):
+    arr1 = opPop()
+    arr2 = opPop()
+    boolVal = opPop()
+    if isinstance(boolVal, bool) and boolVal == True:
+        arr2 = iter(arr2)
+        interpretSPS(arr2)
+    else:
+        arr1 = iter(arr1)
+        interpretSPS(arr1)
+
+def psFor(item):
+    arr = opPop()
+    final = opPop()
+    incr = opPop()
+    init = opPop()
+
+    i = init
+    while i < final:
+        opPush(i)
+        i += incr
+    opPush(i)
+    interpretSPS(arr)
+
+spsDict = {
+    "if": psIf,
+    "ifelse": psIfelse,
+    "for": psFor,
+}
+
+# Heart of the interpreter, makes state changes to dictStack and opStack
+def interpretSPS(codearray): # code is a code array
+    try:
+        item = next(codearray)
+        if isinstance(item, str):
+            if '/' in item:
+                opPush(item)
+            elif funDict.get(item, None) != None:
+                funDict[item]()
+            elif spsDict.get(item, None) != None:
+                spsDict[item]()
+            else:
+                lookup(item)
+        elif isinstance(item, list) or isinstance(item, (int, float, complex)) or isinstance(item, bool):
+            opPush(item)
+        return interpretSPS(codearray)
+    except StopIteration:
+        pass
 
 def interpreter(s): # s is a string
-    interpretSPS(parse(tokenize(s)))
+    return interpretSPS(iter(parse(tokenize(s)))) # send code array to interpretSPS() as iterable
     
 
 #clear opstack and dictstack
@@ -311,15 +406,91 @@ def clearStacks():
     dictstack[:] = []
 
 
-def main():
-    print("main")
+def testInterpreter():
+    clearStacks()
     input1 = """
         /square {dup mul} def 
         [-5 -4 3 -2 1] dup aload length 0 exch -1 1 
         {pop exch square add} for 
         55 eq stack
         """
-    print(tokenize(input1))
-    print(parse(tokenize(input1)))
+    #print(parse(tokenize(input1)))
+    #print(tokenize(input1)) 
+    #print(parse(['b', 'c', '{', 'a', '{', 'a', 'b', '}', '{', '{', 'e', '}', 'a', '}', '}']))   
+    print(interpreter(input1))
+    clearStacks()
+
+
+    input2 ="""
+        /n 5 def
+        /fact {
+            0 dict begin
+            /n exch def
+            n 2 lt
+            { 1}
+            {n 1 sub fact n mul }
+            ifelse
+            end 
+        } def
+        n fact stack
+        """
+
+    print(interpreter(input2))
+    clearStacks()
+
+
+    input3 = """
+            /fact{
+                0 dict
+                begin
+                    /n exch def
+                    1
+                    n -1 1 {mul} for
+                end
+            } def
+            6 fact stack
+            """
+    
+    print(interpreter(input3))
+    clearStacks()
+    
+    input4 = """
+            /sumArray { 0 exch aload length -1 1 {pop add} for } 
+            def/x 5 def
+            /y 10 def 
+            [1 2 3 4 x] sumArray
+            [x 7 8 9 y] sumArray
+            [y 11 12] sumArray
+            [0 0 0] astore
+            stack 
+        """
+    print(interpreter(input4))
+    clearStacks()
+
+
+    input5 = """
+            1 2 3 4 5 count copy 15 1 1 5 {pop exch sub} for 0 eq  
+            stack 
+            """  
+    print(interpreter(input5))
+    clearStacks()
+
+    input6 = """
+            /pow2 {1 dict begin 
+                    /x exch def 
+                    1 x -1 1 {pop 2 mul} for  
+                end } def
+            [1 2 3 4 5 6 7] dup /A exch def
+            0 1 A length 1 sub { /n exch def A n get pow2 /x exch def A n x put} for 
+            A
+            stack
+            """  
+    print(interpreter(input6))
+    clearStacks()
+
+
+def main():
+    testInterpreter()
+    
     
 main()
